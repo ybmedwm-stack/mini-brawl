@@ -15,6 +15,8 @@
 }
 [hidden]{display:none!important}
 html,body{height:100%;margin:0}
+*{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
 img{max-width:100%}
 body{background:var(--ink);color:var(--parch);font-family:var(--body);font-size:16px;overflow:hidden;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}
@@ -419,6 +421,12 @@ document.querySelectorAll('.tb').forEach(b=>{const k=b.dataset.k;
   const dn=e=>{e.preventDefault();b.classList.add('on');set(0,k,true)},up=e=>{e.preventDefault();b.classList.remove('on');set(0,k,false)};
   b.addEventListener('pointerdown',dn);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up);
   b.addEventListener('contextmenu',e=>e.preventDefault())});
+/* iPhone: stop double-tap and pinch zoom while playing */
+const inPlay=()=>phase!='menu'&&phase!='over';
+document.addEventListener('touchstart',e=>{if(e.touches.length>1||(inPlay()&&!e.target.closest('#quit')))e.preventDefault()},{passive:false});
+let lastTE=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTE<350&&!e.target.closest('.pick,.slot,.seg,.go,.ghost,#quit'))e.preventDefault();lastTE=n},{passive:false});
+document.addEventListener('touchmove',e=>{if(inPlay()||e.touches.length>1)e.preventDefault()},{passive:false});
+['gesturestart','gesturechange','gestureend','dblclick'].forEach(n=>document.addEventListener(n,e=>e.preventDefault(),{passive:false}));
 renderMenu();fit();requestAnimationFrame(loop);
 }catch(e){var nb=document.getElementById("nojs");if(nb){nb.hidden=false;nb.textContent="The game hit an error while starting: "+(e&&e.message?e.message:e)}}})();
 </script>
